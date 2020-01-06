@@ -383,7 +383,7 @@ if (!empty($_POST)) {
         <?php
           if(empty($_SESSION)){
          ?>
-        <img src="img/background/mainimg.jpg" style="height:500px;">
+        <img class="background-img" src="img/background/mainimg.jpg" style="height:500px;">
         <form method="post">
           <input type="submit" class="btn-square btn-start" name="start" value="▶ゲームスタート">
         </form>
