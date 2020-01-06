@@ -1,6 +1,6 @@
 <?php
 
-ini_set('log_errors','on');  //ログを取るか
+ini_set('log_errors','off');  //ログを取るか
 ini_set('error_log','php.log');  //ログの出力ファイルを指定
 session_start(); //セッション使う
 
@@ -15,19 +15,31 @@ abstract class Creature{
   protected $hp;
   protected $attackMin;
   protected $attackMax;
-
+  protected $targetImage;
   abstract public function sayCry();
+
   public function setName($name){
     $this->name = $name;
   }
+
   public function getName(){
     return $this->name;
   }
+
   public function setHp($hp){
     $this->hp = $hp;
   }
+
   public function getHp(){
     return $this->hp;
+  }
+
+  public function setImage($targetImage){
+    $this->targetImage = $targetImage;
+  }
+
+  public function getImage(){
+    return $this->targetImage;
   }
 
   public function setAttackMin($attackMin){
@@ -63,10 +75,10 @@ class Human extends Creature {
   protected $rolename;
   protected $tp;
   protected $special_attack;
-  protected $human_img;
+
   public function __construct($name,$human_img,$sex, $rolename, $hp, $tp, $special_attack_name, $attackMin, $attackMax) {
     $this->setName($name);
-    $this->human_img = $human_img;
+    $this->setImage($human_img);
     $this->setSex($sex);
     $this->setHp($hp);
     $this->setTp($tp);
@@ -146,7 +158,7 @@ class Human extends Creature {
     History::set($this->name.'が叫ぶ！');
     switch($this->sex){
       case Sex::MAN :
-        History::set('ぐはぁっ！');
+        History::set('グハッ');
         break;
       case Sex::WOMAN :
         History::set('きゃっ！');
@@ -156,22 +168,17 @@ class Human extends Creature {
 }
 
 class Monster extends Creature{
-  protected $monster_img;
   protected $mp;
   protected $monster_element;
-  // コンストラクタ
+
   public function __construct($name, $monster_img, $monster_element, $hp, $mp, $attackMin, $attackMax) {
     $this->setName($name);
     $this->setHp($hp);
     $this->setElement($monster_element);
     $this->setMp($mp);
-    $this->monster_img = $monster_img;
+    $this->setImage($monster_img);
     $this->setAttackMin($attackMin);
     $this->setAttackMax($attackMax);
-  }
-  // ゲッター
-  public function getImg(){
-    return $this->monster_img;
   }
 
   public function setElement($monster_element){
@@ -199,6 +206,7 @@ class Monster extends Creature{
       case '風':
       $element_attack_point = 700;
       break;
+
       case '闇':
       case '光':
       $element_attack_point = 300 * mt_rand(3,10);
@@ -213,13 +221,15 @@ class Monster extends Creature{
     History::set($this->name.'が叫ぶ！');
     History::set('グルァ');
   }
+
 }
 
 interface HistoryInterface{
   public static function set($str);
   public static function clear();
 }
-// 履歴管理クラス（インスタンス化して複数に増殖させる必要性がないクラスなので、staticにする）
+
+// 履歴管理クラス
 class History implements HistoryInterface{
   public static function set($str){
     // セッションhistoryが作られてなければ作る
@@ -232,6 +242,7 @@ class History implements HistoryInterface{
   }
 }
 
+//人間インスタンス作成
 $humans = array();
 $humans[] = new  Human('主人公', 'img/human/braver.png',Sex::MAN, '勇者', 10000, 400, 'エクスカリバー', 100, 1000);
 $humans[] = new  Human('ヒロイン', 'img/human/heroin.png', Sex::WOMAN, '聖女', 6000, 900, 'ホーリー', 50,500);
@@ -239,6 +250,13 @@ $humans[] = new  Human('格闘家', 'img/human/fighter.png', Sex::MAN, '格闘�
 $humans[] = new  Human('騎士', 'img/human/night.png', Sex::MAN, '騎士', 9000, 300, 'カイザーブレイド', 90, 900);
 $humans[] = new  Human('踊り子', 'img/human/odoriko.png', Sex::WOMAN, '踊り子', 7000, 1200, 'バーンサークル', 70, 500);
 $humans[] = new  Human('暗殺者', 'img/human/killer.png', Sex::MAN, '暗殺者', 4000, 400, 'キラークイーン', 200, 1500);
+
+function createHuman(){
+  global $humans;
+  $human = $humans[mt_rand(0,count($humans)-1)];
+  $_SESSION['human'] =  $human;
+  $_SESSION['itemcount'] = 5;
+}
 
 function createMonster(){
   //モンスター画像ランダム表示
@@ -253,13 +271,6 @@ function createMonster(){
   $monster = new Monster($monster_name,$monster_img,$monster_elements[mt_rand(0, count($monster_elements)-1)] ,mt_rand(10,10000), mt_rand(100,1000),mt_rand(100,500), mt_rand(600,1000));
   History::set($monster->getName().'が現れた！');
   $_SESSION['monster'] =  $monster;
-}
-
-function createHuman(){
-  global $humans;
-  $human = $humans[mt_rand(0,count($humans)-1)];
-  $_SESSION['human'] =  $human;
-  $_SESSION['itemcount'] = 5;
 }
 
 function init(){
@@ -297,7 +308,7 @@ if (!empty($_POST)) {
       $_SESSION['monster']->sayCry();
       // モンスターが攻撃をする
       History::set($_SESSION['monster']->getName().'の攻撃！');
-      if($_SESSION['monster']->getMp() != 0 && !mt_rand(0,3)){ //10分の1の確率で属性攻撃
+      if($_SESSION['monster']->getMp() != 0 && !mt_rand(0,3)){ //4分の1の確率で属性攻撃
         $_SESSION['monster']->element_attack($_SESSION['monster']->getElement(),$_SESSION['human']);
       }else{
       $_SESSION['monster']->attack($_SESSION['human']);
@@ -320,7 +331,7 @@ if (!empty($_POST)) {
     $_SESSION['monster']->sayCry();
     // モンスターが攻撃をする
     History::set($_SESSION['monster']->getName().'の攻撃！');
-    if($_SESSION['monster']->getMp() != 0 && !mt_rand(0,9)){ //10分の1の確率で属性攻撃
+    if($_SESSION['monster']->getMp() != 0 && !mt_rand(0,3)){ //4分の1の確率で属性攻撃
       $_SESSION['monster']->element_attack($_SESSION['monster']->getElement(),$_SESSION['human']);
     }else{
       $_SESSION['monster']->attack($_SESSION['human']);
@@ -383,7 +394,7 @@ if (!empty($_POST)) {
            <div class="enemy-name" style="color:#ffffff;">
              <h2>名前<br><?php echo $_SESSION['monster']->getName();?></h2>
            </div>
-           <img class="enemy-img" src="<?php echo  $_SESSION['monster']->getImg(); ?>" alt="">
+           <img class="enemy-img" src="<?php echo $_SESSION['monster']->getImage(); ?>" alt="">
            <div class="flex-parent-enemy">
              <div class="enemy-role">
                <p>属性<br><?php echo $_SESSION['monster']->getElement();?></p>
@@ -403,22 +414,21 @@ if (!empty($_POST)) {
            </div>
          </div>
         <img class="background-img" src="<?php echo $_SESSION['background-image']; ?>">
-
         <div class="ally-area flex-parent">
           <form method="post" class="command-area">
-            <input type="submit" class="btn-square flex-child" name="attack"  value="たたかう">
-            <input type="submit" class="btn-square flex-child" name="special_attack"  value="とくしゅこうげき">
-            <select class="btn-square" name="item" style="text-indent:40%;" onchange="submit(this.form)">
+            <input type="submit" class="btn-square" name="attack"  value="たたかう">
+            <input type="submit" class="btn-square" name="special_attack"  value="とくしゅこうげき">
+            <select class="btn-square" name="item" onchange="submit(this.form)">
               <option value="どうぐ" selected>どうぐ</option>
               <option value="回復薬">回復薬</option>
               <option value="爆弾">爆弾</option>
               <option value="毒針">毒針</option>
             </select>
-            <input type="submit" class="btn-square flex-child" name="escape" value="にげる">
+            <input type="submit" class="btn-square" name="escape" value="にげる">
           </form>
           <div class="character-area">
             <div class="character-img" style="margin-right:20px;">
-              <img src="<?php echo $_SESSION['human']->getImg(); ?>" alt="">
+              <img src="<?php echo $_SESSION['human']->getImage(); ?>" alt="">
             </div>
             <div class="character-name" style="margin-right:20px;">
               <p>名前<br><?php echo $_SESSION['human']->getName();?></p>

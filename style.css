@@ -94,8 +94,6 @@ input, select {
     vertical-align:middle;
 }
 
-/* maincss */
-/* レイアウト */
 body{
   background-color: #C0C0C0;
   min-width: 960px;
@@ -105,8 +103,10 @@ h1 {
   font-size: 150%;
 }
 
+
+/* maincss */
 .main-area{
-  width:50%;
+  width:70%;
   height:500px;
   margin: 0 auto;
   text-align: center;
@@ -134,12 +134,6 @@ h1 {
   color: red;
 }
 
-.enemy-monster .enemy-img{
-  width:100%;
-  height:250px;
-  margin:0 auto;
-}
-
 .main-area > form > .btn-start{
   position: absolute;
   right: 0;
@@ -150,18 +144,10 @@ h1 {
   width: auto;
 }
 
-.command-area{
-  height:150px;
-  width: 20%;
-  text-align: center;
-
-}
-
-.flex-parent-character{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
+.enemy-monster > .enemy-img{
+  width:100%;
+  height:250px;
+  margin:0 auto;
 }
 
 .flex-parent-enemy{
@@ -176,7 +162,7 @@ h1 {
   box-sizing: border-box;
 }
 
-.flex-parent-enemy > .enemy-role,.enemy-hp,.enemy-mp,.enemy-role,.enemy-attack-min,.enemy-attack-max{
+.flex-parent-enemy > .enemy-role, .enemy-hp, .enemy-mp, .enemy-role, .enemy-attack-min, .enemy-attack-max{
   margin-right:10px;
   box-sizing: border-box;
 }
@@ -187,10 +173,33 @@ h1 {
   margin: 0 auto;
 }
 
+.ally-area > .command-area{
+  height:150px;
+  width: 20%;
+  text-align: left;
+}
 .ally-area > .command-area > .btn-square{
   margin-bottom: 5px;
   width:100%;
   height:30px;
+}
+
+.ally-area > .character-area{
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  line-height: 50px;
+}
+
+.ally-area > .character-area > .character-img{
+  width: 100%;
+  height:150px;
+}
+
+.ally-area > .character-area > .character-hp, .character-tp,.character-name,.character-role,.knockdown-count {
+  width:50%;
+  height:150px;
+  color: white;
 }
 
 .flex-parent{
@@ -199,40 +208,8 @@ h1 {
   background-color: blue;
 }
 
-.ally-area > .character-area{
-  display: flex;
-  flex-direction: row;
-  width: 80%;
-  line-height: 50px;
-  text-align: center;
-}
-
-.ally-area > .character-area > .character-img{
-  width: 100%;
-  height:150px;
-}
-
-.ally-area > .character-area > .character-img > img{
-  width: 100%;
-  height: 150px;
-  text-align:center;
-}
-
-.ally-area > .character-area > .character-hp, .character-tp,.knockdown-count {
-  width:40%;
-  height:150px;
-  color: white;
-}
-
-.ally-area > .character-area >.character-name,.character-role{
-  width:50%;
-  height:150px;
-  color: white;
-}
-
-
 .history-area{
-  width: 50%;
+  width:70%;
   min-height: 150px;
   margin-top:30px;
   border:  solid 5px #ffffff;
@@ -257,13 +234,9 @@ footer {
 }
 
 /* form */
-form{
-  text-align: center;
-}
 
 .btn-square{
   display: inline-block;
-  padding: 0.5em 1em;
   text-decoration: none;
   background: #770000;
   color: #FFF;
@@ -275,4 +248,8 @@ form{
   -webkit-transform: translateY(4px);
   transform: translateY(4px);
   border-bottom: none;
+}
+
+input,select{
+  text-align: left;
 }
